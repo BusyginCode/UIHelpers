@@ -1,0 +1,20 @@
+//==================================================
+// Igor Modal Select2 z-index
+//==================================================
+
+
+.modal-open .select2-dropdown {
+	z-index: 1100;
+}
+
+.select2-dropdown.add-item-var__dropdown {
+	z-index: 1100;
+}
+
+//==================================================
+// Modal DatePicker add z-index
+//==================================================
+
+.modal-open .datepicker-dropdown.dropdown-menu {
+	z-index: 1060 !important;
+}

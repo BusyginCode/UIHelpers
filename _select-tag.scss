@@ -1,0 +1,21 @@
+// ==========================================================================
+// Select tag style for variations on add item page
+// version: 1.0
+// Created by: Artem Panarin
+// ==========================================================================
+
+.select-tag {
+    height: 40px;
+    line-height: 40px;
+    background-color: $color_gray_extra_back;
+    position: relative;
+    border-radius: 3px;
+    padding: 0 40px 0 14px;
+}
+
+    .select-tag__cancel {
+        right: 14px;
+        top: 15px;
+        bottom: 15px;
+        position: absolute;
+    }

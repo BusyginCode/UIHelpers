@@ -1,0 +1,48 @@
+.lightbox-slider {  }
+
+.lightbox-slider__icon {
+    background: none;
+}
+
+.lightbox-slider__icon_prev {
+
+    &:before {
+        @include sprite(lightbox_left);
+    }
+}
+
+    .lightbox-slider__icon_prev:hover {
+
+        &:before {
+            @include sprite(lightbox_left_hover);
+        }
+    }
+
+.lightbox-slider__icon_next {
+
+    &:before {
+        @include sprite(lightbox_right);
+    }
+}
+
+    .lightbox-slider__icon_next {
+
+        &:before {
+            @include sprite(lightbox_right_hover);
+        }
+    }
+
+.lightbox-slider__icon_close {
+    background: none;
+
+    &:before, &:after {
+        opacity: 0.7;
+    }
+}
+
+.lightbox-slider__icon_close:hover, .lightbox-slider__icon_close:focus {
+
+    &:before, &:after {
+        opacity: 1;
+    }
+}
