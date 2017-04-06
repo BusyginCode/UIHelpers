@@ -1,3 +1,10 @@
+$color_gray_primary:       #d5d9dc;
+$color_blue_primary:       #4a90e2;
+@mixin hover-only-transition($properties...){
+    transition-property: $properties;
+    transition-duration: .3s;
+}
+
 .carousel {
     position: relative;
 }

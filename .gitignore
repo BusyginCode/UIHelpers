@@ -1,0 +1,9 @@
+.*/
+.eslintcache
+
+# NPM
+node_modules
+npm-debug.log
+
+# Ubuntu
+.directory
