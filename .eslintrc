@@ -23,14 +23,23 @@
     "quotes": [0],
     "react/jsx-filename-extension": [0],
     "comma-dangle": [0],
+    "import/no-named-as-default-member": [0],
+    "react/no-string-refs": [0],
   },
   "plugins": [
-    "react", "import"
+    "react", "import", "babel"
   ],
   "settings": {
     "import/parser": "babel-eslint",
     "import/resolve": {
       "moduleDirectory": ["node_modules", "src"]
+    }
+  },
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaFeatures": {
+        "jsx": true,
+        "modules": true
     }
   },
   "globals": {

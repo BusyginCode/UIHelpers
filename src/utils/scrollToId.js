@@ -1,4 +1,5 @@
-function getOffsetSum(elem, top = 0) {
+function getOffsetSum(elem, topMargin = 0) {
+  let top = topMargin;
   if (elem) {
     top += elem.offsetTop;
     return getOffsetSum(elem.offsetParent, top);
@@ -7,9 +8,9 @@ function getOffsetSum(elem, top = 0) {
 }
 
 export default function ScrollToId(id) {
-  let key = 0,
-    nextScroll = getOffsetSum(document.getElementById(id)),
-    keyCounter = 0;
+  let key = 0;
+  const nextScroll = getOffsetSum(document.getElementById(id));
+  let keyCounter = 0;
   const move = setInterval(() => {
     key += (nextScroll > 0 ? 1 : -1);
     keyCounter += key;

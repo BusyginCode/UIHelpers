@@ -46,6 +46,562 @@ $color_for_tab: #E3F0FF;
 
 
 
+@mixin reset-clickable {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    display: inline-block;
+    vertical-align: top;
+    cursor: pointer;
+    text-decoration: none;
+    font-family: inherit;
+    text-align: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+
+@mixin clearfix {
+    &:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+}
+
+@mixin placeholder {
+    &::-webkit-input-placeholder {@content}
+    &:-moz-placeholder           {@content}
+    &::-moz-placeholder          {@content}
+    &:-ms-input-placeholder      {@content}
+}
+
+
+@mixin keyframes($name) {
+    @-webkit-keyframes #{$name} {
+        @content;
+    }
+    @-moz-keyframes #{$name} {
+        @content;
+    }
+    @-ms-keyframes #{$name} {
+        @content;
+    }
+    @keyframes #{$name} {
+        @content;
+    }
+}
+
+@mixin animation($str) {
+    -webkit-animation: #{$str};
+    -moz-animation: #{$str};
+    -ms-animation: #{$str};
+    -o-animation: #{$str};
+    animation: #{$str};
+}
+
+@mixin hover-only-transition($properties...){
+    transition-property: $properties;
+    transition-duration: .3s;
+}
+
+@mixin animation-transition($properties...){
+    transition-property: $properties;
+    transition-duration: .3s;
+}
+
+$icons: (
+    sprite: (width: 1470px, height: 1160px, pngPath: '../img/sprite.png', svgPath: '../img/sprite.svg'),
+	logo: (width: 141px, height: 18px, backgroundX: -1280px, backgroundY: -660px),
+	logo_smaller: (width: 110px, height: 14px, backgroundX: -1280px, backgroundY: -688px),
+	pad_default: (width: 70px, height: 70px, backgroundX: -1360px, backgroundY: -788px),
+	pad_default_action_none: (width: 70px, height: 70px, backgroundX: -1280px, backgroundY: -788px),
+	pad_default_hover: (width: 70px, height: 70px, backgroundX: -876px, backgroundY: -940px),
+	pad_default_state_loading: (width: 70px, height: 70px, backgroundX: -796px, backgroundY: -940px),
+	pad_shape_avatar: (width: 182px, height: 182px, backgroundX: -412px, backgroundY: -940px),
+	pad_shape_avatar_hover: (width: 182px, height: 182px, backgroundX: -220px, backgroundY: -940px),
+	pad_shape_avatar_state_loading: (width: 182px, height: 182px, backgroundX: -604px, backgroundY: -940px),
+	pad_shape_droparea: (width: 669px, height: 209px, backgroundX: -790px, backgroundY: -439px),
+	pad_shape_droparea_active: (width: 669px, height: 209px, backgroundX: -790px, backgroundY: -220px),
+	pad_shape_droparea_loading: (width: 670px, height: 210px, backgroundX: -790px, backgroundY: 0px),
+	pad_shape_droparea_wide: (width: 780px, height: 210px, backgroundX: 0px, backgroundY: -440px),
+	pad_shape_droparea_wide_active: (width: 780px, height: 210px, backgroundX: 0px, backgroundY: -220px),
+	pad_shape_droparea_wide_loading: (width: 780px, height: 210px, backgroundX: 0px, backgroundY: 0px),
+	pad_shape_shifted: (width: 270px, height: 270px, backgroundX: -280px, backgroundY: -660px),
+	pad_shape_shifted_hover: (width: 270px, height: 270px, backgroundX: -560px, backgroundY: -660px),
+	pad_shape_shifted_state_loading: (width: 270px, height: 270px, backgroundX: 0px, backgroundY: -660px),
+	pad_size_huge: (width: 210px, height: 210px, backgroundX: -1060px, backgroundY: -660px),
+	pad_size_huge_hover: (width: 210px, height: 210px, backgroundX: 0px, backgroundY: -940px),
+	pad_size_huge_state_loading: (width: 210px, height: 210px, backgroundX: -840px, backgroundY: -660px),
+	pad_size_smaller: (width: 39px, height: 39px, backgroundX: -938px, backgroundY: -880px),
+	pad_size_smaller_action_none: (width: 39px, height: 39px, backgroundX: -889px, backgroundY: -880px),
+	pad_size_smaller_hover: (width: 39px, height: 39px, backgroundX: -840px, backgroundY: -880px),
+	pad_size_smaller_state_loading: (width: 39px, height: 39px, backgroundX: -987px, backgroundY: -880px),
+	store-link_id_apple: (width: 97px, height: 28px, backgroundX: -1280px, backgroundY: -712px),
+	store-link_id_google: (width: 97px, height: 28px, backgroundX: -1280px, backgroundY: -750px),
+	web_id_facebook: (width: 8px, height: 18px, backgroundX: -1431px, backgroundY: -660px),
+	web_id_facebook_hover: (width: 8px, height: 18px, backgroundX: -1449px, backgroundY: -660px),
+	web_id_instagram: (width: 16px, height: 16px, backgroundX: -1387px, backgroundY: -750px),
+	web_id_instagram_hover: (width: 16px, height: 16px, backgroundX: -1443px, backgroundY: -712px),
+	web_id_pinterest: (width: 18px, height: 18px, backgroundX: -1387px, backgroundY: -712px),
+	web_id_pinterest_hover: (width: 18px, height: 18px, backgroundX: -1415px, backgroundY: -712px),
+	web_id_vk: (width: 18px, height: 10px, backgroundX: -1428px, backgroundY: -688px),
+	web_id_vk_hover: (width: 18px, height: 10px, backgroundX: -1400px, backgroundY: -688px),
+);
+
+$sprite: map-get($icons, sprite) !default;
+
+/// Retrive an attributes value for a specific icon in the sprite map
+/// @param {string} $icon - The name of the icon
+/// @param {string} $attr - The attribute you wish to retrieve (e.g. width)
+@function sprite-attr($icon, $attr) {
+    $newIcon: map-get($icons, $icon);
+    @if $newIcon == null {
+        @warn "Can't find an icon with the name #{$icon}";
+    }
+    @return map-get($newIcon, $attr);
+}
+
+
+/// Create a map with the specified icon of attributes
+/// @param {string} $icon - The name of the icon
+@function icon-attr($icon) {
+    $attr: (
+            width: sprite-attr($icon, width),
+            height: sprite-attr($icon, height),
+            x: sprite-attr($icon, backgroundX),
+            y: sprite-attr($icon, backgroundY)
+    );
+
+    @return $attr;
+}
+
+%sprite {
+    display: inline-block;
+    background-image: url(map-get($sprite, svgPath));
+    background-size: map-get($sprite, width) map-get($sprite, height);
+}
+
+@mixin sprite($icon, $type: all) {
+    @if $type == all {
+        // Shares the backgrounds
+        @extend %sprite;
+    }
+
+    $iconMap: icon-attr($icon);
+
+    // Outputs dimensions in em
+    @if $type == all or $type == size {
+        width: map-get($iconMap, width) + 1;
+        height: map-get($iconMap, height) + 1;
+    }
+
+    // Outputs background position in em
+    @if $type == all or $type == bg {
+        background-position: map-get($iconMap, x) - 5 map-get($iconMap, y) - 5;
+    }
+
+}
+
+
+/* normalize.css v4.0.0 | MIT License | github.com/necolas/normalize.css */
+
+/**
+ * 1. Change the default font family in all browsers (opinionated).
+ * 2. Prevent adjustments of font size after orientation changes in IE and iOS.
+ */
+
+html {
+    font-family: sans-serif; /* 1 */
+    -ms-text-size-adjust: 100%; /* 2 */
+    -webkit-text-size-adjust: 100%; /* 2 */
+}
+
+/**
+ * Remove the margin in all browsers (opinionated).
+ */
+
+body {
+    margin: 0;
+}
+
+/* HTML5 display definitions
+   ========================================================================== */
+
+/**
+ * Add the correct display in IE 9-.
+ * 1. Add the correct display in Edge, IE, and Firefox.
+ * 2. Add the correct display in IE.
+ */
+
+article,
+aside,
+details, /* 1 */
+figcaption,
+figure,
+footer,
+header,
+main, /* 2 */
+menu,
+nav,
+section,
+summary { /* 1 */
+    display: block;
+}
+
+/**
+ * Add the correct display in IE 9-.
+ */
+
+audio,
+canvas,
+progress,
+video {
+    display: inline-block;
+}
+
+/**
+ * Add the correct display in iOS 4-7.
+ */
+
+audio:not([controls]) {
+    display: none;
+    height: 0;
+}
+
+/**
+ * Add the correct vertical alignment in Chrome, Firefox, and Opera.
+ */
+
+progress {
+    vertical-align: baseline;
+}
+
+/**
+ * Add the correct display in IE 10-.
+ * 1. Add the correct display in IE.
+ */
+
+template, /* 1 */
+[hidden] {
+    display: none;
+}
+
+/* Links
+   ========================================================================== */
+
+/**
+ * Remove the gray background on active links in IE 10.
+ */
+
+a {
+    background-color: transparent;
+}
+
+/**
+ * Remove the outline on focused links when they are also active or hovered
+ * in all browsers (opinionated).
+ */
+
+a:active,
+a:hover {
+    outline-width: 0;
+}
+
+/* Text-level semantics
+   ========================================================================== */
+
+/**
+ * 1. Remove the bottom border in Firefox 39-.
+ * 2. Add the correct text decoration in Chrome, Edge, IE, Opera, and Safari.
+ */
+
+abbr[title] {
+    border-bottom: none; /* 1 */
+    text-decoration: underline; /* 2 */
+    text-decoration: underline dotted; /* 2 */
+}
+
+/**
+ * Prevent the duplicate application of `bolder` by the next rule in Safari 6.
+ */
+
+b,
+strong {
+    font-weight: inherit;
+}
+
+/**
+ * Add the correct font weight in Chrome, Edge, and Safari.
+ */
+
+b,
+strong {
+    font-weight: bolder;
+}
+
+/**
+ * Add the correct font style in Android 4.3-.
+ */
+
+dfn {
+    font-style: italic;
+}
+
+/**
+ * Correct the font size and margin on `h1` elements within `section` and
+ * `article` contexts in Chrome, Firefox, and Safari.
+ */
+
+h1 {
+    font-size: 2em;
+    margin: 0.67em 0;
+}
+
+/**
+ * Add the correct background and color in IE 9-.
+ */
+
+mark {
+    background-color: #ff0;
+    color: #000;
+}
+
+/**
+ * Add the correct font size in all browsers.
+ */
+
+small {
+    font-size: 80%;
+}
+
+/**
+ * Prevent `sub` and `sup` elements from affecting the line height in
+ * all browsers.
+ */
+
+sub,
+sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+
+sub {
+    bottom: -0.25em;
+}
+
+sup {
+    top: -0.5em;
+}
+
+/* Embedded content
+   ========================================================================== */
+
+/**
+ * Remove the border on images inside links in IE 10-.
+ */
+
+img {
+    border-style: none;
+}
+
+/**
+ * Hide the overflow in IE.
+ */
+
+svg:not(:root) {
+    overflow: hidden;
+}
+
+/* Grouping content
+   ========================================================================== */
+
+/**
+ * 1. Correct the inheritance and scaling of font size in all browsers.
+ * 2. Correct the odd `em` font sizing in all browsers.
+ */
+
+code,
+kbd,
+pre,
+samp {
+    font-family: monospace, monospace; /* 1 */
+    font-size: 1em; /* 2 */
+}
+
+/**
+ * Add the correct margin in IE 8.
+ */
+
+figure {
+    margin: 1em 40px;
+}
+
+/**
+ * 1. Add the correct box sizing in Firefox.
+ * 2. Show the overflow in Edge and IE.
+ */
+
+hr {
+    box-sizing: content-box; /* 1 */
+    height: 0; /* 1 */
+    overflow: visible; /* 2 */
+}
+
+/* Forms
+   ========================================================================== */
+
+/**
+ * 1. Change font properties to `inherit` in all browsers (opinionated).
+ * 2. Remove the margin in Firefox and Safari.
+ */
+
+button,
+input,
+select,
+textarea {
+    font: inherit; /* 1 */
+    margin: 0; /* 2 */
+}
+
+/**
+ * Restore the font weight unset by the previous rule.
+ */
+
+optgroup {
+    font-weight: bold;
+}
+
+/**
+ * Show the overflow in IE.
+ * 1. Show the overflow in Edge.
+ * 2. Show the overflow in Edge, Firefox, and IE.
+ */
+
+button,
+input, /* 1 */
+select { /* 2 */
+    overflow: visible;
+}
+
+/**
+ * Remove the inheritance of text transform in Edge, Firefox, and IE.
+ * 1. Remove the inheritance of text transform in Firefox.
+ */
+
+button,
+select { /* 1 */
+    text-transform: none;
+}
+
+/**
+ * 1. Prevent a WebKit bug where (2) destroys native `audio` and `video`
+ *    controls in Android 4.
+ * 2. Correct the inability to style clickable types in iOS.
+ */
+
+button,
+html [type="button"], /* 1 */
+[type="reset"],
+[type="submit"] {
+    -webkit-appearance: button; /* 2 */
+}
+
+/**
+ * Remove the inner border and padding in Firefox.
+ */
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+}
+
+/**
+ * Restore the focus styles unset by the previous rule.
+ */
+
+button:-moz-focusring,
+input:-moz-focusring {
+    outline: 1px dotted ButtonText;
+}
+
+/**
+ * Change the border, margin, and padding in all browsers (opinionated).
+ */
+
+fieldset {
+    border: 1px solid #c0c0c0;
+    margin: 0 2px;
+    padding: 0.35em 0.625em 0.75em;
+}
+
+/**
+ * 1. Correct the text wrapping in Edge and IE.
+ * 2. Correct the color inheritance from `fieldset` elements in IE.
+ * 3. Remove the padding so developers are not caught out when they zero out
+ *    `fieldset` elements in all browsers.
+ */
+
+legend {
+    box-sizing: border-box; /* 1 */
+    color: inherit; /* 2 */
+    display: table; /* 1 */
+    max-width: 100%; /* 1 */
+    padding: 0; /* 3 */
+    white-space: normal; /* 1 */
+}
+
+/**
+ * Remove the default vertical scrollbar in IE.
+ */
+
+textarea {
+    overflow: auto;
+}
+
+/**
+ * 1. Add the correct box sizing in IE 10-.
+ * 2. Remove the padding in IE 10-.
+ */
+
+[type="checkbox"],
+[type="radio"] {
+    box-sizing: border-box; /* 1 */
+    padding: 0; /* 2 */
+}
+
+/**
+ * Correct the cursor style of increment and decrement buttons in Chrome.
+ */
+
+[type="number"]::-webkit-inner-spin-button,
+[type="number"]::-webkit-outer-spin-button {
+    height: auto;
+}
+
+/**
+ * Correct the odd appearance of search inputs in Chrome and Safari.
+ */
+
+[type="search"] {
+    -webkit-appearance: textfield;
+}
+
+/**
+ * Remove the inner padding and cancel buttons in Chrome on OS X and
+ * Safari on OS X.
+ */
+
+[type="search"]::-webkit-search-cancel-button,
+[type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none;
+}
+
+
 
 
 // family

@@ -1,5 +1,5 @@
 export default function clickInBlock(target, block) {
-  if (block == target) {
+  if (block === target) {
     return (true);
   }
   if (target.parentElement) {
