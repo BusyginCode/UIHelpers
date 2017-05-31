@@ -2,31 +2,20 @@ import React, { Component, PropTypes } from 'react';
 import { documentMouseUp } from '../../utils';
 import './carousel.scss';
 
-/*
-  Для вертикального режима необходимо отсутствие arrows, id="gallery-navigation",
-  direction="vertical" а также высота и ширина родителя.
-  Также у детей должно быть overflow: hidden и конкретная ширина,
-  ширину надо смочь прокидывать пропсом.
-
-  Горизонтально нужно  direction="horizontal" и id="tags" и arrows,
-  можно добавить возможность подключать свой css со своими кнопками детьми и т.д.
-  Полная кастомизация.
-
-  Для горизонтального скролла нужно зажать шифт.
-*/
-
 export default class Carousel extends Component {
 
   static propTypes = {
-    scrollLength: PropTypes.number,
-    direction: PropTypes.string,
-    id: PropTypes.string,
-    arrows: PropTypes.string,
-    children: PropTypes.any,
+    scrollLength: PropTypes.number.isRequired,
+    direction: PropTypes.string.isRequired,
+    children: PropTypes.any.isRequired,
+    elementWidth: PropTypes.number,
+    elementHeight: PropTypes.number,
+    arrows: PropTypes.bool,
+    animationSpeed: PropTypes.number,
   };
 
   state = {
-    animationSpeed: 1,
+    animationSpeed: this.props.animationSpeed || 1,
     parentHeight: null,
     childHeight: null,
     resolution: null,
@@ -51,14 +40,22 @@ export default class Carousel extends Component {
     const move = setInterval(() => {
       key += animation;
       keyCounter += key;
-      this.carouselContainer.scrollLeft += key;
+      if (this.props.direction === 'vertical') {
+        this.carouselContainer.scrollTop += key;
+      } else {
+        this.carouselContainer.scrollLeft += key;
+      }
       nextScroll -= key;
       if ((keyCounter >= nextScrollSave / 2 && key > 0) ||
         (keyCounter <= nextScrollSave / 2 && key < 0)) {
         clearInterval(move);
         const moveSlower = setInterval(() => {
           key -= animation;
-          this.carouselContainer.scrollLeft += key;
+          if (this.props.direction === 'vertical') {
+            this.carouselContainer.scrollTop += key;
+          } else {
+            this.carouselContainer.scrollLeft += key;
+          }
           nextScroll -= key;
           if (key === 0) {
             clearInterval(moveSlower);
@@ -103,19 +100,30 @@ export default class Carousel extends Component {
 
   headerClassFormation = () => (
       `carousel${this.props.direction ? ` carousel_direction_${this.props.direction}` : ''}
-      ${this.props.id ? ` carousel_id_${this.props.id}` : ''}
-      ${this.props.arrows ? ` carousel_arrows_${this.props.arrows}` : ''}`
+       carousel_id_${this.props.direction === 'vertical' ? 'gallery-navigation' : 'tags'}
+       carousel_arrows_angles`
     )
 
   render() {
+    const carouselStyle = { width: `${this.props.elementWidth}px`, height: `${this.props.elementHeight}px` };
+    const carouselContainerStyle = { width: `${this.props.elementWidth + 15}px` };
+
     return (
       <div
         className={this.headerClassFormation()}
         ref={ref => (this.carousel = ref)}
         onMouseUp={this.unFixPosition}
       >
-        <div className="carousel__stage" ref={ref => (this.stage = ref)}>
-          <div className="carousel__container" ref={ref => (this.carouselContainer = ref)}>
+        <div
+          className="carousel__stage"
+          ref={ref => (this.stage = ref)}
+          style={carouselStyle}
+        >
+          <div
+            className="carousel__container"
+            ref={ref => (this.carouselContainer = ref)}
+            style={carouselContainerStyle}
+          >
             <div
               className="carousel__ribbon"
               ref={ref => (this.ribbon = ref)}
@@ -127,14 +135,14 @@ export default class Carousel extends Component {
           </div>
         </div>
         { this.props.arrows &&
-          <div>
+          <div className={`carousel__arrows-container-${this.props.direction}`}>
             <button
-              className="carousel__arrow carousel__arrow_direction_prev"
+              className={`carousel__arrow carousel__arrow_direction_prev carousel__arrow_direction_prev-${this.props.direction}`}
               type="button"
               onMouseDown={this.handlePrevClick}
             />
             <button
-              className="carousel__arrow carousel__arrow_direction_next"
+              className={`carousel__arrow carousel__arrow_direction_next carousel__arrow_direction_next-${this.props.direction}`}
               type="button"
               onMouseDown={this.handleNextClick}
             />
