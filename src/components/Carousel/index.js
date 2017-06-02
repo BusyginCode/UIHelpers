@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import classNames from 'classnames';
 import { documentMouseUp } from '../../utils';
 import './carousel.scss';
 
@@ -12,6 +13,8 @@ export default class Carousel extends Component {
     elementHeight: PropTypes.number,
     arrows: PropTypes.bool,
     animationSpeed: PropTypes.number,
+    prevButtonClassName: PropTypes.string,
+    nextButtonClassName: PropTypes.string,
   };
 
   state = {
@@ -105,8 +108,14 @@ export default class Carousel extends Component {
     )
 
   render() {
-    const carouselStyle = { width: `${this.props.elementWidth}px`, height: `${this.props.elementHeight}px` };
-    const carouselContainerStyle = { width: `${this.props.elementWidth + 15}px` };
+    const {
+      prevButtonClassName,
+      nextButtonClassName,
+      elementWidth,
+      elementHeight,
+    } = this.props;
+    const carouselStyle = { width: `${elementWidth}px`, height: `${elementHeight}px` };
+    const carouselContainerStyle = { width: `${elementWidth + 15}px` };
 
     return (
       <div
@@ -137,12 +146,18 @@ export default class Carousel extends Component {
         { this.props.arrows &&
           <div className={`carousel__arrows-container-${this.props.direction}`}>
             <button
-              className={`carousel__arrow carousel__arrow_direction_prev carousel__arrow_direction_prev-${this.props.direction}`}
+              className={classNames(`carousel__arrow carousel__arrow_direction_prev-${this.props.direction}`, {
+                carousel__arrow_direction_prev: !prevButtonClassName,
+                [prevButtonClassName]: prevButtonClassName
+              })}
               type="button"
               onMouseDown={this.handlePrevClick}
             />
             <button
-              className={`carousel__arrow carousel__arrow_direction_next carousel__arrow_direction_next-${this.props.direction}`}
+              className={classNames(`carousel__arrow carousel__arrow_direction_next-${this.props.direction}`, {
+                carousel__arrow_direction_next: !nextButtonClassName,
+                [nextButtonClassName]: nextButtonClassName
+              })}
               type="button"
               onMouseDown={this.handleNextClick}
             />

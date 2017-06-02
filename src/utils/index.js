@@ -2,7 +2,7 @@ export clickInBlock from './clickInBlock';
 
 export documentClick from './documentClick';
 
-export documentMouseMove from './documentClick';
+export documentMouseMove from './documentMouseMove';
 
 export documentMouseUp from './documentMouseUp';
 
