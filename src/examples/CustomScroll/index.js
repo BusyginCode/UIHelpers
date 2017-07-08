@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import CustomScroll from '../../components/CustomScroll';
 import { customScrollExampleText } from '../../consts';
+import './custom-scroll.scss';
 
 export default class CustomScrollExample extends Component {
   render() {

@@ -1,0 +1,34 @@
+.Custom__arrow-next {
+  &:hover {
+    &:after {
+      border-color: green;
+    }
+  }
+  &:after {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 5px;
+    border: 0 solid red;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    transform: rotateZ(-45deg);
+  }
+}
+
+.Custom__arrow-prev {
+  &:after {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 5px;
+    border: 0 solid red;
+    border-top-width: 1px;
+    border-left-width: 1px;
+    transform: rotateZ(-135deg);
+  }
+}
+
+.custom-width {
+  width: 40px;
+}

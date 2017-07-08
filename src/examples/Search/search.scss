@@ -1,0 +1,21 @@
+.button {
+  background: -1px -1px no-repeat #4a90e2;
+  padding: 0 19px;
+  border: 1px solid transparent;
+  background-size: calc(100% + 8px) 4px;
+  transition-property: background-color,border-color,color;
+  transition-duration: .3s;
+  height: 44px;
+  line-height: 42px;
+  color: #fff;
+  border-radius: 3px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  font-weight: 400;
+  text-align: center;
+}
+
+.button:hover {
+  background-color: #2975cc;
+  background-image: none;
+}

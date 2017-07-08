@@ -1,0 +1,80 @@
+.keyword {
+  white-space: nowrap;
+  padding: 0 29px 0 7px;
+  position: relative;
+  background: #EFF6FF;
+  transition-property: background-color;
+  transition-duration: .3s;
+  vertical-align: top;
+  display: inline-block;
+  cursor: pointer;
+  border-radius: 3px;
+  margin: 6px 6px 0 0;
+}
+
+.keyword__label {
+  color: #333;
+  line-height: 30px;
+  font-size: 14px;
+}
+
+.keyword__delete, .keyword__delete.cancel {
+  position: absolute;
+}
+
+.cancel {
+  position: relative;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  font-family: inherit;
+  text-align: inherit;
+  color: inherit;
+  background: 0 0;
+  border: none;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.cancel_size_smallest {
+  width: 8px;
+  height: 8px;
+}
+
+.keyword__delete {
+  right: 11px;
+  top: 12px;
+}
+
+.cancel:before {
+  width: 2px;
+  height: 18px;
+  margin: -9px 0 0 -1px;
+}
+
+.cancel:after, .cancel:before {
+  transform: rotate(45deg) scale(1.15556);
+  background-color: #333;
+  content: '';
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transition-property: background-color;
+  transition-duration: .3s;
+}
+
+.cancel_size_smallest:after, .cancel_size_smallest:before {
+  transform: rotate(45deg) scale(.57778);
+}
+
+.cancel:after {
+  width: 18px;
+  height: 2px;
+  margin: -1px 0 0 -9px;
+}
+
+.cancel:hover:after, .cancel:hover:before {
+  background-color: #4a90e2;
+}

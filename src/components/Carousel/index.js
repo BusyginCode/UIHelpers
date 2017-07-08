@@ -113,9 +113,11 @@ export default class Carousel extends Component {
       nextButtonClassName,
       elementWidth,
       elementHeight,
+      direction,
     } = this.props;
     const carouselStyle = { width: `${elementWidth}px`, height: `${elementHeight}px` };
     const carouselContainerStyle = { width: `${elementWidth + 15}px` };
+    const arrowVerticalWidth = direction === 'vertical' ? { width: `${elementWidth}px` } : {};
 
     return (
       <div
@@ -151,6 +153,7 @@ export default class Carousel extends Component {
                 [prevButtonClassName]: prevButtonClassName
               })}
               type="button"
+              style={arrowVerticalWidth}
               onMouseDown={this.handlePrevClick}
             />
             <button
@@ -159,6 +162,7 @@ export default class Carousel extends Component {
                 [nextButtonClassName]: nextButtonClassName
               })}
               type="button"
+              style={arrowVerticalWidth}
               onMouseDown={this.handleNextClick}
             />
           </div>

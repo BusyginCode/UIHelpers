@@ -1,0 +1,14 @@
+.CustomScroll__custom-class {
+  &:after {
+    background: red;
+  }
+}
+
+.CustomScroll__custom-component {
+  background: green;
+  height:100%;
+  
+  &:after {
+    display: none;
+  }
+}

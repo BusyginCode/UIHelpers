@@ -29,13 +29,14 @@ $color_blue_primary:       #4a90e2;
   flex-direction: column;
   height: 100%;
 }
-  .carousel_direction_vertical .carousel__stage {
-    height: 100%;
-  }
-  .carousel_direction_vertical .carousel__container {
-    height: 100%;
-    overflow-y: scroll;
-  }
+
+.carousel_direction_vertical .carousel__stage {
+  height: 100%;
+}
+.carousel_direction_vertical .carousel__container {
+  height: 100%;
+  overflow-y: scroll;
+}
 
 /* arrows */
 .carousel__arrow {
@@ -43,10 +44,12 @@ $color_blue_primary:       #4a90e2;
   border: none;
   padding: 0;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
 /* arrows skins */
-.carousel_arrows_angles .carousel__arrow {
+.carousel__arrow {
   position: absolute;
   top: 0;
   height: 100%;
@@ -59,17 +62,19 @@ $color_blue_primary:       #4a90e2;
 
 .carousel__arrow_direction_prev {
   right: 100%;
+  justify-content: flex-end;
+  padding-right: 15px;
 }
 
 .carousel__arrow_direction_next {
   left: 100%;
+  justify-start: flex-end;
+  padding-left: 15px;
 }
 
 .carousel__arrow:after {
   content: '';
   display: block;
-  position: absolute;
-  top: 12px;
   width: 5px;
   height: 5px;
   border: 0 solid #d5d9dc;
@@ -83,7 +88,6 @@ $color_blue_primary:       #4a90e2;
   -webkit-transform: rotate(-45deg);
       -ms-transform: rotate(-45deg);
           transform: rotate(-45deg);
-  left: 21px;
 }
 
 .carousel__arrow_direction_next:after {
@@ -92,7 +96,6 @@ $color_blue_primary:       #4a90e2;
   -webkit-transform: rotate(45deg);
       -ms-transform: rotate(45deg);
           transform: rotate(45deg);
-  right: 21px;
 }
 
 .carousel__arrow:hover:after {
@@ -156,19 +159,31 @@ $color_blue_primary:       #4a90e2;
   color: #fff;
 }
 
-.carousel__arrows-container-vertical {
-  .carousel__arrow_direction_prev-vertical {
-    top: 0px;
-    height: 30px;
-    right: auto;
-    transform: rotateZ(90deg);
-  }
+.carousel__arrow_direction_prev-vertical {
+  top: 0px;
+  height: 30px;
+  right: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-right: 0;
 
-  .carousel__arrow_direction_next-vertical {
-    top: auto;
-    transform: rotateZ(90deg);
-    left: auto;
-    height: 30px;
+  &:after {
+    transform: rotateZ(45deg);
+  }
+}
+
+.carousel__arrow_direction_next-vertical {
+  top: auto;
+  left: auto;
+  height: 30px;
+  padding-left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:after {
+    transform: rotateZ(135deg);
   }
 }
 

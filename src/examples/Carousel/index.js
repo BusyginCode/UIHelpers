@@ -74,13 +74,13 @@ export default class CarouselExample extends Component {
           </Carousel>
           <div style={{ width: '200px', height: '300px', marginTop: '20px', display: 'inline-block', }}>
             <Carousel
-              elementWidth={40}
+              elementWidth={100}
               scrollLength={100}
               direction="vertical"
               arrows
             >
               {lastExamplesV.map(item =>
-                <button className="carousel__item custom-width" key={Math.random()}>{item}</button>
+                <button style={{ width: '100px' }} className="carousel__item custom-width" key={Math.random()}>{item}</button>
               )}
             </Carousel>
           </div>
