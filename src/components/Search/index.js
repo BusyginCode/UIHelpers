@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
+import classNames from 'classnames';
 import Query from './query/query';
-import { documentClick, documentKeyDown } from '../../utils';
 import './search.scss';
 
 const isIE = !!(window.navigator.userAgent.indexOf("MSIE ") > 0 || !!navigator.userAgent.match(/Trident.*rv:11\./));
@@ -23,12 +23,14 @@ export default class SearchContainer extends Component {
     enterQuery: PropTypes.func,
     placeholder: PropTypes.string,
     search: PropTypes.bool,
-    separators: PropTypes.array,
+    separator: PropTypes.string,
     checkString: PropTypes.func,
-    maxLength: PropTypes.number,
-    blurControl: PropTypes.object,
+    maxQueryLength: PropTypes.number,
     line: PropTypes.bool,
     visibleRows: PropTypes.number,
+    backspaceDeleteQueries: PropTypes.bool,
+    maxQueries: PropTypes.number,
+    minQueryLength: PropTypes.number,
   }
 
   state = {
@@ -43,7 +45,7 @@ export default class SearchContainer extends Component {
 
   componentDidMount() {
     this.wheelCheck();
-    if (!this.props.line) {
+    if (this.props.options) {
       this.myRefs.dropDown.style.paddingTop = `${this.myRefs.search.offsetHeight}px`;
     }
   }
@@ -55,34 +57,13 @@ export default class SearchContainer extends Component {
   }
 
   componentDidUpdate() {
-    if (!this.props.line) {
+    if (this.props.options) {
       this.myRefs.dropDown.style.paddingTop = `${this.myRefs.search.offsetHeight}px`;
       if (this.state.text.length === 0) {
         this.state.optionHighlightIndex = 0;
         this.myRefs.wordsList.scrollTop = 0;
       }
     }
-  }
-
-  setWordsClassname() {
-    const defaultClass = 'search__widget words words_line ';
-    if (this.state.wheelCheck && this.state.wordFocus) {
-      return `${defaultClass}words_focus words_scrolled `;
-    } else if (this.state.wheelCheck) {
-      return `${defaultClass}words_scrolled `;
-    } else if (this.state.wordFocus) {
-      return `${defaultClass}words_focus `;
-    }
-    return defaultClass;
-  }
-
-  setFocus = (div) => {
-    div.focus();
-    const range = document.createRange();
-    const selection = window.getSelection();
-    range.setStartAfter(div.lastChild);
-    selection.removeAllRanges();
-    selection.addRange(range);
   }
 
   setScroll(sign) {
@@ -92,11 +73,11 @@ export default class SearchContainer extends Component {
 
   setOption() {
     this.state.options = [];
+    if (!this.state.text) return null;
 
     const filteredOptionsLength = this.props.options.filter(
       option => option.toString().toLowerCase().indexOf(this.state.text.toLowerCase()) >= 0
     ).length;
-
     if (this.state.text && filteredOptionsLength === 0) {
       return <div className="words__option">Ничего не найдено</div>;
     }
@@ -108,7 +89,7 @@ export default class SearchContainer extends Component {
       return (
         <li
           className={`words__option${this.state.optionHighlightIndex === key ? ' words__option_highlight' : ''}`}
-          onClick={() => this.optionClick(option)} // eslint-disable-line
+          onMouseDown={() => this.optionClick(option)} // eslint-disable-line
           onMouseOver={() => this.mouseOver(key)} // eslint-disable-line
           key={option}
           ref={key}
@@ -121,19 +102,23 @@ export default class SearchContainer extends Component {
 
   inputChange = (e) => {
     const input = this.myRefs.searchInput;
-    this.setState({
-      text: e.target.value
-    });
+    this.setState({ text: e.target.value });
     if (this.validCheck(e.target.value)) {
-      if (e.target.value.length === 1 &&
-        (this.props.separators.indexOf(e.target.value) >= 0 || e.keyCode === 32)
+      if ((e.target.value.length === 1 &&
+        (this.props.separator === e.target.value || e.keyCode === 32)) ||
+        ((this.props.queries.length > this.props.maxQueries))
       ) {
         this.setState({ text: '' });
+        return;
       }
-      if (this.props.separators.indexOf(e.target.value[e.target.value.length - 1]) >= 0 &&
+      if (this.props.separator === e.target.value[e.target.value.length - 1] &&
         !this.state.edit
       ) {
-        this.enter(e.target.value.substr(0, e.target.value.length - 1));
+        if ((e.target.value.length >= this.props.minQueryLength) || !this.props.minQueryLength) {
+          this.enter(e.target.value.substr(0, e.target.value.length - 1));
+        } else {
+          this.setState({ text: '' });
+        }
       }
       this.wheelCheck();
     } else {
@@ -149,7 +134,7 @@ export default class SearchContainer extends Component {
     });
     if (e.keyCode === 8 && e.target.value.length === 0 && !this.state.edit) {
       e.preventDefault();
-      if (this.props.line) {
+      if (!this.props.backspaceDeleteQueries) {
         this.formEditInput(false);
       } else if (this.props.queries.length !== 0) {
         this.props.deleteQuery(this.props.queries.length - 1);
@@ -158,9 +143,7 @@ export default class SearchContainer extends Component {
     if (e.keyCode === 13) {
       this.state.blurBlock = true;
       e.preventDefault();
-      this.setState({
-        blurBlock: true
-      });
+      this.setState({ blurBlock: true });
       this.enter(e.target.value, true);
       input.blur();
     }
@@ -187,11 +170,13 @@ export default class SearchContainer extends Component {
       if (text.indexOf(',') >= 0 || this.state.edit) {
         text.split(', ').forEach((textQuery) => {
           textQuery.split(',').forEach((query) => {
-            if (queries.indexOf(query) < 0 && query.indexOf('<') < 0 && query.indexOf('>') < 0 && query.length > 1) {
-              if (query.length < this.props.maxLength) {
+            if (queries.indexOf(query) < 0 && query.indexOf('<') < 0 &&
+              query.indexOf('>') < 0 && query.length >= this.props.minQueryLength
+            ) {
+              if (query.length < this.props.maxQueryLength) {
                 queries.push(query);
               } else {
-                queries.push(query.substr(0, this.props.maxLength));
+                queries.push(query.substr(0, this.props.maxQueryLength));
               }
             }
           });
@@ -230,33 +215,10 @@ export default class SearchContainer extends Component {
     }
   }
 
-  focus = () => {
-    this.myRefs.searchInput.focus();
-  }
-
   wordBlur = () => {
-    if (!this.state.blurBlock || this.state.edit || !this.props.line) {
-      if (this.props.blurControl && this.props.blurControl.search) {
-        this.enter(this.myRefs.searchInput.value, true);
-      }
-      this.setState({
-        blurBlock: false,
-        edit: false
-      });
-      this.setState({
-        text: ''
-      });
-    }
-    this.setState({
-      wordFocus: false
-    });
-    if (!this.props.line) {
-      documentClick.unsubscribe(this.wordBlur);
-      documentKeyDown.unsubscribe(this.keyControl);
-    } else {
-      delete this.props.blurControl.search;
-      delete this.props.blurControl.focus;
-    }
+    console.log('wordBlur');
+    this.enter(this.myRefs.searchInput.value, true);
+    this.setState({ wordFocus: false });
   }
 
   wordClick = () => {
@@ -272,12 +234,7 @@ export default class SearchContainer extends Component {
   }
 
   inputFocus = () => {
-    if (!this.props.line) {
-      documentKeyDown.subscribe(this.keyControl);
-      setTimeout(() => { documentClick.subscribe(this.wordBlur); }, 200);
-    } else {
-      this.props.blurControl.focus = true;
-    }
+    this.wordClick();
   }
 
   deleteQuery = (key, e) => {
@@ -291,8 +248,8 @@ export default class SearchContainer extends Component {
   * Dropdown type functions
   */
 
-
   optionClick = (option) => {
+    console.log(option);
     this.props.enterQuery(option);
     this.setState({
       text: '',
@@ -358,7 +315,12 @@ export default class SearchContainer extends Component {
 
   headClassFormation() {
     return (
-      `search__widget words${this.state.wordFocus ? ' words_focus ' : ''}${this.state.text.length > 0 ? ' words_active' : ''}`
+      classNames("search__widget words", {
+        words_focus: this.state.wordFocus,
+        words_active: this.state.text.length > 0,
+        words_line: this.props.line,
+        words_scrolled: this.props.line && this.state.wheelCheck
+      })
     );
   }
 
@@ -366,29 +328,27 @@ export default class SearchContainer extends Component {
     const placeholder = this.props.queries.length === 0 && !isIE
       ? this.props.placeholder
       : null;
-
     return (
       <div
-        className={(this.props.line ? this.setWordsClassname() : this.headClassFormation())}
+        className={this.headClassFormation()}
         ref={(ref) => { this.myRefs.words = ref; }}
-        onMouseDown={this.wordClick}
-        onBlur={(this.props.line ? this.wordBlur : null)}
+        onBlur={this.wordBlur}
       >
-        { !this.props.line &&
-        <div
-          className="words__dropdown"
-          ref={(ref) => { this.myRefs.dropDown = ref; }}
-        >
-          <ul
-            className="words__list"
-            ref={(ref) => { this.myRefs.wordsList = ref; }}
+        {Boolean(this.props.options) &&
+          <div
+            className="words__dropdown"
+            ref={(ref) => { this.myRefs.dropDown = ref; }}
           >
-            {this.setOption()}
-          </ul>
-        </div>
+            <ul
+              className="words__list"
+              ref={(ref) => { this.myRefs.wordsList = ref; }}
+            >
+              {this.setOption()}
+            </ul>
+          </div>
         }
         <div
-          className={`words__stage${this.props.line ? ' search__input' : ''}`}
+          className={`words__stage${this.props.search ? ' search__input' : ''}`}
           ref={(ref) => { this.myRefs.search = ref; }}
           id="search"
         >
@@ -407,7 +367,7 @@ export default class SearchContainer extends Component {
                 value={this.state.text}
                 tabIndex="-1"
                 className="words__input"
-                maxLength={this.state.edit ? Infinity : this.props.maxLength}
+                maxLength={this.state.edit ? Infinity : this.props.maxQueryLength}
                 placeholder={placeholder}
                 type={this.props.search ? 'search' : 'text'}
                 ref={(ref) => { this.myRefs.searchInput = ref; }}

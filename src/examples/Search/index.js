@@ -43,6 +43,7 @@ export default class SearchExample extends Component {
         </div>
         <div className="Example__container">
           <h2>Examples:</h2>
+          <h3>Line search</h3>
           <div style={{ display: 'flex' }}>
             <Search
               queries={this.state.queries}
@@ -50,9 +51,9 @@ export default class SearchExample extends Component {
               enterQuery={this.addQuery}
               placeholder={'Особые товары'}
               search
-              separators={[',']}
+              separator=","
               checkString={regexpCheck}
-              maxLength={140}
+              maxQueryLength={140}
               // line props
               line
               blurControl={this.state.blurControl}
@@ -63,18 +64,102 @@ export default class SearchExample extends Component {
               Найти
             </button>
           </div>
-          <div style={{ marginTop: '100px', display: 'flex' }}>
+          <h3>Search with dropdown</h3>
+          <div>
             <Search
-              options={this.state.data}
+              queries={this.state.queries}
               deleteQuery={this.deleteQuery}
               enterQuery={this.addQuery}
               placeholder={'Особые товары'}
-              separators={[',']}
-              maxLength={140}
+              separator=","
+              maxQueryLength={140}
               // drop-down props
-              queries={this.state.queries}
+              line
+              blurControl={this.state.blurControl}
+              options={this.state.data}
               visibleRows={5}
+            />
+          </div>
+          <h3>Search with rows</h3>
+          <div style={{ display: 'flex' }}>
+            <Search
+              queries={this.state.queries}
+              deleteQuery={this.deleteQuery}
+              enterQuery={this.addQuery}
+              placeholder={'Особые товары'}
+              separator=","
+              maxQueryLength={140}
+            />
+          </div>
+          <h3>Delete queries by backspace</h3>
+          <div style={{ display: 'flex' }}>
+            <Search
+              queries={this.state.queries}
+              deleteQuery={this.deleteQuery}
+              enterQuery={this.addQuery}
+              placeholder={'Особые товары'}
+              separator=","
+              maxQueryLength={140}
+              line
+              search
+              blurControl={this.state.blurControl}
+              backspaceDeleteQueries
+            />
+            <button
+              className="search__submit button"
+            >
+              Найти
+            </button>
+          </div>
+          <h3>Max queries length</h3>
+          <div style={{ display: 'flex' }}>
+            <Search
+              queries={this.state.queries}
+              deleteQuery={this.deleteQuery}
+              enterQuery={this.addQuery}
+              placeholder={'Особые товары'}
+              separator=","
+              maxQueryLength={140}
               maxQueries={5}
+              line
+              search
+            />
+            <button
+              className="search__submit button"
+            >
+              Найти
+            </button>
+          </div>
+          <h3>Min query length</h3>
+          <div style={{ display: 'flex' }}>
+            <Search
+              queries={this.state.queries}
+              deleteQuery={this.deleteQuery}
+              enterQuery={this.addQuery}
+              placeholder={'Особые товары'}
+              separator=","
+              maxQueryLength={140}
+              minQueryLength={3}
+              line
+              search
+            />
+            <button
+              className="search__submit button"
+            >
+              Найти
+            </button>
+          </div>
+          <h3>Different separator</h3>
+          <div style={{ display: 'flex' }}>
+            <Search
+              queries={this.state.queries}
+              deleteQuery={this.deleteQuery}
+              enterQuery={this.addQuery}
+              placeholder={'Особые товары'}
+              separator="."
+              maxQueryLength={140}
+              line
+              search
             />
             <button
               className="search__submit button"

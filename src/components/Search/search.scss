@@ -107,12 +107,6 @@
   border-color: #95a0a9; 
 }
 
-.words_active .words__stage {
-  border-color: transparent;
-  transition-property: border-color;
-  transition-duration: .3s; 
-}
-
 .words_error .words__stage {
   border-color: #d00d62;
   transition-property: border-color;
