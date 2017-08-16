@@ -129,5 +129,9 @@ module.exports = {
          NODE_ENV: JSON.stringify("development")
        }
     }),
+    new webpack.DllReferencePlugin({
+      context: path.join(__dirname, '../src'),
+      manifest: require('./vendor-prod-manifest.json'),
+    }),
   ],
 };

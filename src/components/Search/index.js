@@ -22,22 +22,35 @@ export default class SearchContainer extends Component {
     deleteQuery: PropTypes.func,
     enterQuery: PropTypes.func,
     placeholder: PropTypes.string,
-    search: PropTypes.bool,
+    inputTypeSearch: PropTypes.bool,
     separator: PropTypes.string,
-    checkString: PropTypes.func,
+    stringValidate: PropTypes.any,
     maxQueryLength: PropTypes.number,
     line: PropTypes.bool,
     visibleRows: PropTypes.number,
     backspaceDeleteQueries: PropTypes.bool,
     maxQueries: PropTypes.number,
     minQueryLength: PropTypes.number,
+    inputClassName: PropTypes.string,
+    queryClassName: PropTypes.string,
+    queryDeleteIconClassName: PropTypes.string,
+    dropDownOptionClassName: PropTypes.string,
+    dropDownClassName: PropTypes.string,
+  }
+
+  static defaultProps = {
+    minQueryLength: 0,
+    separator: ',',
+    maxQueries: Infinity,
+    maxQueryLength: Infinity,
+    inputTypeSearch: false,
+    visibleRows: 5,
   }
 
   state = {
     active: null,
     wheelCheck: null,
     wordsFocus: null,
-    blurBlock: null,
     edit: null,
     text: '',
     wordsClass: null
@@ -51,7 +64,7 @@ export default class SearchContainer extends Component {
   }
 
   componentWillUpdate() {
-    if (this.props.queries.length > 20) {
+    if (this.props.queries.length > this.props.maxQueries) {
       this.deleteQuery(this.props.queries.length - 1);
     }
   }
@@ -68,36 +81,7 @@ export default class SearchContainer extends Component {
 
   setScroll(sign) {
     this.myRefs.wordsList.scrollTop +=
-      (this.refs[this.state.optionHighlightIndex].offsetHeight * (sign ? 1 : -1));
-  }
-
-  setOption() {
-    this.state.options = [];
-    if (!this.state.text) return null;
-
-    const filteredOptionsLength = this.props.options.filter(
-      option => option.toString().toLowerCase().indexOf(this.state.text.toLowerCase()) >= 0
-    ).length;
-    if (this.state.text && filteredOptionsLength === 0) {
-      return <div className="words__option">Ничего не найдено</div>;
-    }
-    const filteredOptions = this.props.options.filter(option =>
-      (!this.state.text || (option.toString().toLowerCase().indexOf(this.state.text) !== -1))
-    );
-    return filteredOptions.map((option, key) => {
-      this.state.options.push(option);
-      return (
-        <li
-          className={`words__option${this.state.optionHighlightIndex === key ? ' words__option_highlight' : ''}`}
-          onMouseDown={() => this.optionClick(option)} // eslint-disable-line
-          onMouseOver={() => this.mouseOver(key)} // eslint-disable-line
-          key={option}
-          ref={key}
-        >
-          { option }
-        </li>
-      );
-    });
+      (this.refs[`option-${this.state.optionHighlightIndex}`].offsetHeight * (sign ? 1 : -1));
   }
 
   inputChange = (e) => {
@@ -130,7 +114,7 @@ export default class SearchContainer extends Component {
   enterPrevDefault = (e) => {
     const input = this.myRefs.searchInput;
     this.setState({
-      text: (e.keyCode === 32 && e.target.value.length === 1 ? '' : e.target.value)
+      text: e.target.value,
     });
     if (e.keyCode === 8 && e.target.value.length === 0 && !this.state.edit) {
       e.preventDefault();
@@ -141,9 +125,7 @@ export default class SearchContainer extends Component {
       }
     }
     if (e.keyCode === 13) {
-      this.state.blurBlock = true;
       e.preventDefault();
-      this.setState({ blurBlock: true });
       this.enter(e.target.value, true);
       input.blur();
     }
@@ -152,8 +134,7 @@ export default class SearchContainer extends Component {
     }
   }
 
-  formEditInput = (blurBlock) => {
-    this.state.blurBlock = blurBlock;
+  formEditInput = () => {
     const input = this.myRefs.searchInput;
     this.setState({
       edit: true,
@@ -167,9 +148,9 @@ export default class SearchContainer extends Component {
   enter = (text, needSearch) => {
     const queries = [];
     if (this.props.queries.indexOf(text) < 0 || this.state.edit) {
-      if (text.indexOf(',') >= 0 || this.state.edit) {
-        text.split(', ').forEach((textQuery) => {
-          textQuery.split(',').forEach((query) => {
+      if (text.indexOf(this.props.separator) >= 0 || this.state.edit) {
+        text.split(this.props.separator).forEach((textQuery) => {
+          textQuery.split(this.props.separator).forEach((query) => {
             if (queries.indexOf(query) < 0 && query.indexOf('<') < 0 &&
               query.indexOf('>') < 0 && query.length >= this.props.minQueryLength
             ) {
@@ -182,7 +163,10 @@ export default class SearchContainer extends Component {
           });
         });
         this.setState({ edit: false });
-        this.props.enterQuery(queries, needSearch);
+        this.props.enterQuery(
+          queries.filter(query => query.length).length ? queries : this.props.queries,
+          needSearch
+        );
       } else {
         this.setState({ edit: false });
         this.props.enterQuery(text, needSearch);
@@ -200,6 +184,8 @@ export default class SearchContainer extends Component {
         queryKey={key}
         formEditInput={this.formEditInput}
         deleteQuery={this.deleteQuery}
+        queryClassName={this.props.queryClassName}
+        queryDeleteIconClassName={this.props.queryDeleteIconClassName}
       />
     ))
 
@@ -216,7 +202,6 @@ export default class SearchContainer extends Component {
   }
 
   wordBlur = () => {
-    console.log('wordBlur');
     this.enter(this.myRefs.searchInput.value, true);
     this.setState({ wordFocus: false });
   }
@@ -249,11 +234,11 @@ export default class SearchContainer extends Component {
   */
 
   optionClick = (option) => {
-    console.log(option);
-    this.props.enterQuery(option);
     this.setState({
       text: '',
       optionHighlightIndex: 0
+    }, () => {
+      this.props.enterQuery(option);
     });
   }
 
@@ -264,11 +249,10 @@ export default class SearchContainer extends Component {
   }
 
   keyControl = (e) => {
-    const optionIndexBlock = ReactDOM.findDOMNode(this.refs[this.state.optionHighlightIndex]); // eslint-disable-line
+    const optionIndexBlock = ReactDOM.findDOMNode(this.refs[`option-${this.state.optionHighlightIndex}`]); // eslint-disable-line
     if (e.keyCode === 13 && this.state.options.length > 0) {
       this.optionClick(this.state.options[this.state.optionHighlightIndex]);
     }
-
     if (e.keyCode === 40 && (this.state.optionHighlightIndex < this.state.options.length - 1)) {
       this.setState({
         optionHighlightIndex: this.state.optionHighlightIndex + 1
@@ -294,9 +278,9 @@ export default class SearchContainer extends Component {
   };
 
   validCheck = (text) => {
-    if (!this.props.checkString ||
-      (typeof this.props.checkString === 'function' && this.props.checkString(text)) ||
-      (typeof this.props.checkString !== 'function' && this.props.checkString.test(text))
+    if (!this.props.stringValidate ||
+      (typeof this.props.stringValidate === 'function' && this.props.stringValidate(text)) ||
+      (typeof this.props.stringValidate !== 'function' && this.props.stringValidate.test(text))
     ) {
       return true;
     }
@@ -324,6 +308,35 @@ export default class SearchContainer extends Component {
     );
   }
 
+  renderOptions() {
+    this.state.options = [];
+    if (!this.state.text) return null;
+
+    const filteredOptionsLength = this.props.options.filter(
+      option => option.toString().toLowerCase().indexOf(this.state.text.toLowerCase()) >= 0
+    ).length;
+    if (this.state.text && filteredOptionsLength === 0) {
+      return <div className="words__option">Ничего не найдено</div>;
+    }
+    const filteredOptions = this.props.options.filter(option =>
+      (!this.state.text || (option.toString().toLowerCase().indexOf(this.state.text) !== -1))
+    );
+    return filteredOptions.map((option, key) => {
+      this.state.options.push(option);
+      return (
+        <li
+          className={`words__option${this.state.optionHighlightIndex === key ? ' words__option_highlight' : ''} ${this.props.dropDownOptionClassName}`}
+          onMouseDown={() => this.optionClick(option)} // eslint-disable-line
+          onMouseOver={() => this.mouseOver(key)} // eslint-disable-line
+          key={option}
+          ref={`option-${key}`}
+        >
+          { option }
+        </li>
+      );
+    });
+  }
+
   render() {
     const placeholder = this.props.queries.length === 0 && !isIE
       ? this.props.placeholder
@@ -340,15 +353,15 @@ export default class SearchContainer extends Component {
             ref={(ref) => { this.myRefs.dropDown = ref; }}
           >
             <ul
-              className="words__list"
+              className={`words__list ${this.props.dropDownClassName}`}
               ref={(ref) => { this.myRefs.wordsList = ref; }}
             >
-              {this.setOption()}
+              {this.renderOptions()}
             </ul>
           </div>
         }
         <div
-          className={`words__stage${this.props.search ? ' search__input' : ''}`}
+          className={`words__stage${this.props.inputTypeSearch ? ' search__input ' : ''} ${this.props.inputClassName}`}
           ref={(ref) => { this.myRefs.search = ref; }}
           id="search"
         >
@@ -369,7 +382,7 @@ export default class SearchContainer extends Component {
                 className="words__input"
                 maxLength={this.state.edit ? Infinity : this.props.maxQueryLength}
                 placeholder={placeholder}
-                type={this.props.search ? 'search' : 'text'}
+                type={this.props.inputTypeSearch ? 'search' : 'text'}
                 ref={(ref) => { this.myRefs.searchInput = ref; }}
                 onChange={this.inputChange}
                 onKeyDown={this.enterPrevDefault}
@@ -382,4 +395,3 @@ export default class SearchContainer extends Component {
     );
   }
 }
-

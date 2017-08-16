@@ -18,3 +18,19 @@
 .modal-open .datepicker-dropdown.dropdown-menu {
 	z-index: 1060 !important;
 }
+
+.select-tag {
+    height: 40px;
+    line-height: 40px;
+    background-color: gray;
+    position: relative;
+    border-radius: 3px;
+    padding: 0 40px 0 14px;
+}
+
+    .select-tag__cancel {
+        right: 14px;
+        top: 15px;
+        bottom: 15px;
+        position: absolute;
+    }

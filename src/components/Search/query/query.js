@@ -9,6 +9,8 @@ export default class Query extends Component {
     formEditInput: PropTypes.func,
     deleteQuery: PropTypes.func,
     line: PropTypes.bool,
+    queryClassName: PropTypes.string,
+    queryDeleteIconClassName: PropTypes.string,
   }
 
   componentDidUpdate() {
@@ -42,7 +44,7 @@ export default class Query extends Component {
   render() {
     return (
       <div
-        className="words__tag keyword"
+        className={`words__tag keyword ${this.props.queryClassName}`}
         onClick={this.stopPropagation}
       >
         <div
@@ -53,7 +55,7 @@ export default class Query extends Component {
           {this.props.value}
         </div>
         <div
-          className="words__delete keyword__delete cancel cancel_size_smallest"
+          className={`words__delete keyword__delete cancel cancel_size_smallest ${this.props.queryDeleteIconClassName}`}
           onClick={this.deleteQuery}
         />
       </div>
