@@ -1,0 +1,16 @@
+.SliderParent {
+  height: 200px;
+  overflow: hidden;
+  user-select: none;
+}
+
+.SliderChild {
+  width: 50px;
+  height: 50px;
+  background: red;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  user-select: none;
+}
